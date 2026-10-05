@@ -17,7 +17,7 @@ public class LoginPage extends BasePage {
 
     @Step("Открываем страницу логина")
     public LoginPage openPage() {
-        open();          // если URL задан в BasePage / Configuration.baseUrl
+        open();         
         return this;
     }
 
