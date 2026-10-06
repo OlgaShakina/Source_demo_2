@@ -1,27 +1,28 @@
 package pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+import com.codeborne.selenide.SelenideElement;
+import io.qameta.allure.Step;
+
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selenide.$;
 
 public class CheckoutCompletePage extends BasePage {
-    private final By completeHeader = By.className("complete-header");
-    private final By backHomeButton = By.id("back-to-products");
-    private final By generatePdfButton = By.id("generate-pdf-order");
 
-    public CheckoutCompletePage(WebDriver driver) {
-        super(driver);
-    }
+    private final SelenideElement completeHeader = $(".complete-header");
+    private final SelenideElement backHomeBtn    = $("#back-to-products");
 
+    @Step("Получаем заголовок благодарности")
     public String getCompleteHeaderText() {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(completeHeader)).getText();
+        return completeHeader.shouldBe(visible).getText();
     }
 
+    @Step("Проверяем, что кнопка Back Home видна")
     public boolean isBackHomeButtonVisible() {
-        return driver.findElement(backHomeButton).isDisplayed();
+        return backHomeBtn.is(visible);
     }
 
+    @Step("Нажимаем Back Home")
     public void clickBackHome() {
-        driver.findElement(backHomeButton).click();
+        backHomeBtn.click();
     }
 }

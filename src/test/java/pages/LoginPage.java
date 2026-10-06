@@ -1,57 +1,51 @@
 package pages;
 
+import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Step;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import user.User;
 
-import static pages.BasePage.BASE_URL;
-import static pages.BasePage.DATA_TEST_PATTERN;
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.open;
 
 public class LoginPage extends BasePage {
-    private final By usernameInput = By.cssSelector(DATA_TEST_PATTERN.formatted("username"));
-    private final By passwordInput = By.cssSelector(DATA_TEST_PATTERN.formatted("password"));
-    private final By loginBtn = By.id("login-button");
-    private final By error = By.xpath("//h3[@data-test='error']");
 
-    public LoginPage(WebDriver driver) {
-        super(driver);
-    }
+    private final SelenideElement usernameInput = $("[data-test='username']");
+    private final SelenideElement passwordInput = $("[data-test='password']");
+    private final SelenideElement loginBtn      = $("#login-button");
+    private final SelenideElement error         = $("h3[data-test='error']");
 
-
-    @Step("Открываем соответствующий браузер")
-    public void open() {
-        driver.get(BASE_URL);
-    }
-
-    public void open(String url) {
-        driver.get(BASE_URL);
+    @Step("Открываем страницу логина")
+    public LoginPage openPage() {
+        open();          // если URL задан в BasePage / Configuration.baseUrl
+        return this;
     }
 
     @Step("Авторизация под кредами пользователя")
-    public void login(User user) {
+    public ProductsPage login(User user) {
         fillLoginInput(user.getUser());
         fillPasswordInput(user.getPassword());
-        driver.findElement(loginBtn).click();
+        loginBtn.click();
+        return new ProductsPage();
     }
 
     @Step("Заполняем поле логина {user}")
     public void fillLoginInput(String user) {
-        driver.findElement(usernameInput).sendKeys(user);
+        usernameInput.setValue(user);
     }
 
-    @Step("Заполняем поле пароля {password}")
+    @Step("Заполняем поле пароля")
     public void fillPasswordInput(String password) {
-        driver.findElement(passwordInput).sendKeys(password);
+        passwordInput.setValue(password);
     }
 
     @Step("Проверяем, что сообщение об ошибке отображается")
     public boolean isErrorVisible() {
-        return driver.findElement(By.cssSelector("[data-test='error']")).isDisplayed();
+        return error.is(visible);
     }
 
-    @Step("Проверяем, что текст сообщения об ошибке")
+    @Step("Получаем текст ошибки")
     public String getErrorText() {
-        return driver.findElement(error).getText();
+        return error.shouldBe(visible).getText();
     }
 }

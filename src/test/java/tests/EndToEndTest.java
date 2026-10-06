@@ -1,54 +1,47 @@
 package tests;
 
-import enums.TitleNaming;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
 import java.util.List;
 
-import static enums.TitleNaming.*;
+import static enums.TitleNaming.PRODUCTS;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static user.UserFactory.withAdminPermission;
 
 public class EndToEndTest extends BaseTest {
+
     SoftAssert soft = new SoftAssert();
 
-    @Test(description = "Полный цикл покупки: Корзина -> Checkout -> Overview -> Complete")
+    @Test(description = "Полный цикл покупки: Cart -> Checkout -> Overview -> Complete")
     public void checkFullCheckoutFlow() {
         List<String> goodList = List.of("Sauce Labs Bike Light", "Sauce Labs Backpack");
 
-        loginPage.open();
+        loginPage.openPage();
         loginPage.login(withAdminPermission());
         assertTrue(productsPage.isPageTitleVisible());
         assertEquals(productsPage.getPageTitle(), PRODUCTS.getDisplayName());
 
-        for (String goodsName : goodList) {
-            productsPage.addGoodsToCart(goodsName);
-        }
-
+        goodList.forEach(productsPage::addGoodsToCart);
         productsPage.switchToCart();
-        assertEquals(cartPage.getProductsNames().size(), goodList.size(), "Товары не добавились в корзину!");
+        assertEquals(cartPage.getProductsNames().size(), goodList.size(), "Товары не добавились!");
 
         cartPage.clickCheckout();
-
         checkoutPage.fillCheckoutInformation("John", "Doe", "12345");
         checkoutPage.clickContinue();
 
         assertTrue(overviewPage.isFinishButtonVisible(), "Кнопка Finish не видна!");
-
-        soft.assertTrue(overviewPage.isProductListDisplayed(), "Список товаров на странице обзора пуст!");
-        soft.assertEquals(overviewPage.getProductNames().size(), goodList.size(), "Количество товаров в обзоре не совпадает!");
+        soft.assertTrue(overviewPage.isProductListDisplayed(), "Список товаров пуст!");
+        soft.assertEquals(overviewPage.getProductNames().size(), goodList.size());
 
         overviewPage.clickFinish();
 
-        String expectedHeader = "Thank you for your order!";
-        assertEquals(completePage.getCompleteHeaderText(), expectedHeader, "Текст благодарности не совпадает!");
-
-        assertTrue(completePage.isBackHomeButtonVisible(), "Кнопка Back Home не отображается!");
+        assertEquals(completePage.getCompleteHeaderText(), "Thank you for your order!");
+        assertTrue(completePage.isBackHomeButtonVisible());
 
         completePage.clickBackHome();
-        assertEquals(productsPage.getPageTitle(), PRODUCTS.getDisplayName(), "Не вернулись на главную страницу!");
+        assertEquals(productsPage.getPageTitle(), PRODUCTS.getDisplayName());
 
         soft.assertAll();
     }

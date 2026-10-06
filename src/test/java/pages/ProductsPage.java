@@ -1,50 +1,56 @@
 package pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideElement;
+import io.qameta.allure.Step;
 
+import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Selenide.*;
 
 public class ProductsPage extends BasePage {
-    public static final String ADD_TO_CART_PATTERN = "//*[text()='%s']/" +
-            "ancestor::div[@class='inventory_item']//child::button[text()='Add to cart']";
-    private final By pageTitle = By.cssSelector(DATA_TEST_PATTERN.formatted("title"));
-    private final By cartBadge = By.cssSelector(DATA_TEST_PATTERN.formatted("shopping-cart-badge"));
-    private final By cartLink = By.cssSelector(DATA_TEST_PATTERN.formatted("shopping-cart-link"));
 
+    private final SelenideElement pageTitle    = $("[data-test='title']");
+    private final SelenideElement cartLink     = $(".shopping_cart_link");
+    private final SelenideElement cartCounter  = $(".shopping_cart_badge");
+    private final ElementsCollection addButtons = $$("button[id^='add-to-cart']");
+    private final ElementsCollection itemNames  = $$(".inventory_item_name");
 
-    public ProductsPage(WebDriver driver) {
-        super(driver);
-    }
-
+    @Step("Проверяем, что заголовок страницы виден")
     public boolean isPageTitleVisible() {
-        return driver.findElement(pageTitle).isDisplayed();
+        pageTitle.shouldBe(visible);
+        return true;
     }
 
+    @Step("Получаем заголовок страницы")
     public String getPageTitle() {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(pageTitle));
-        return driver.findElement(pageTitle).getText();
+        return pageTitle.shouldBe(visible).getText();
     }
 
-    public void addGoodsToCart(String goodsName) {
-        By addToCartBtn = By.xpath(ADD_TO_CART_PATTERN.formatted(goodsName));
-        driver.findElement(addToCartBtn).click();
+    @Step("Добавляем товар '{name}' в корзину")
+    public void addGoodsToCart(String name) {
+        $$(".inventory_item")
+                .findBy(text(name))
+                .$("button")
+                .click();
     }
 
-    public void addGoodsToCart(int goodsIndex) {
-        By addToCartBtn = By.xpath("//button[text()='Add to cart']");
-        driver.findElements(addToCartBtn).get(goodsIndex).click();
+    @Step("Добавляем товар по индексу {index} в корзину")
+    public void addGoodsToCart(int index) {
+        addButtons.get(index).click();
     }
 
-    public String checkCountersValue() {
-        return driver.findElement(cartBadge).getText();
-    }
-
-    public String checkCountersColor() {
-        return driver.findElement(cartBadge).getCssValue("background-color");
-    }
-
+    @Step("Переходим в корзину")
     public void switchToCart() {
-        driver.findElement(cartLink).click();
+        cartLink.click();
+    }
+
+    @Step("Получаем значение счётчика корзины")
+    public String checkCountersValue() {
+        return cartCounter.shouldBe(visible).getText();
+    }
+
+    @Step("Получаем цвет счётчика корзины")
+    public String checkCountersColor() {
+        return cartCounter.getCssValue("background-color");
     }
 }

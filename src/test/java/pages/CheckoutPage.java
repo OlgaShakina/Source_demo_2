@@ -1,31 +1,32 @@
 package pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+import com.codeborne.selenide.SelenideElement;
+import io.qameta.allure.Step;
+
+import static com.codeborne.selenide.Selenide.$;
 
 public class CheckoutPage extends BasePage {
-    private final By firstNameInput = By.id("first-name");
-    private final By lastNameInput = By.id("last-name");
-    private final By zipCodeInput = By.id("postal-code");
-    private final By continueButton = By.id("continue");
-    private final By cancelButton = By.id("cancel");
 
-    public CheckoutPage(WebDriver driver) {
-        super(driver);
+    private final SelenideElement firstName = $("#first-name");
+    private final SelenideElement lastName  = $("#last-name");
+    private final SelenideElement zipCode   = $("#postal-code");
+    private final SelenideElement continueBtn = $("#continue");
+    private final SelenideElement cancelBtn   = $("#cancel");
+
+    @Step("Заполняем данные: {fName} {lName}, {zip}")
+    public void fillCheckoutInformation(String fName, String lName, String zip) {
+        firstName.setValue(fName);
+        lastName.setValue(lName);
+        zipCode.setValue(zip);
     }
 
-    public void fillCheckoutInformation(String firstName, String lastName, String zipCode) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(firstNameInput)).sendKeys(firstName);
-        driver.findElement(lastNameInput).sendKeys(lastName);
-        driver.findElement(zipCodeInput).sendKeys(zipCode);
-    }
-
+    @Step("Нажимаем Continue")
     public void clickContinue() {
-        driver.findElement(continueButton).click();
+        continueBtn.click();
     }
 
+    @Step("Нажимаем Cancel")
     public void clickCancel() {
-        driver.findElement(cancelButton).click();
+        cancelBtn.click();
     }
 }
