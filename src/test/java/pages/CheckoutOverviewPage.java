@@ -1,43 +1,40 @@
 package pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideElement;
+import io.qameta.allure.Step;
 
-import java.util.ArrayList;
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.$$;
+
 import java.util.List;
 
 public class CheckoutOverviewPage extends BasePage {
-    private final By finishButton = By.id("finish");
-    private final By cancelButton = By.id("cancel");
-    private final By cartItems = By.className("cart_item");
-    private final By itemNames = By.className("inventory_item_name");
-    private final By itemPrices = By.className("inventory_item_price");
 
-    public CheckoutOverviewPage(WebDriver driver) {
-        super(driver);
-    }
+    private final SelenideElement finishBtn     = $("#finish");
+    private final SelenideElement cancelBtn     = $("#cancel");
+    private final ElementsCollection cartItems  = $$(".cart_item");
+    private final ElementsCollection itemNames  = $$(".inventory_item_name");
+    private final ElementsCollection itemPrices = $$(".inventory_item_price");
 
+    @Step("Нажимаем Finish")
     public void clickFinish() {
-        wait.until(ExpectedConditions.elementToBeClickable(finishButton)).click();
+        finishBtn.click();
     }
 
+    @Step("Проверяем, что список товаров отображается")
     public boolean isProductListDisplayed() {
-        return !driver.findElements(cartItems).isEmpty();
+        return !cartItems.isEmpty();
     }
 
-    public ArrayList<String> getProductNames() {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(cartItems));
-        List<WebElement> items = driver.findElements(itemNames);
-        ArrayList<String> names = new ArrayList<>();
-        for (WebElement item : items) {
-            names.add(item.getText());
-        }
-        return names;
+    @Step("Получаем названия товаров на обзоре")
+    public List<String> getProductNames() {
+        return itemNames.texts();
     }
 
+    @Step("Проверяем, что кнопка Finish видна")
     public boolean isFinishButtonVisible() {
-        return driver.findElement(finishButton).isDisplayed();
+        return finishBtn.is(visible);
     }
 }
