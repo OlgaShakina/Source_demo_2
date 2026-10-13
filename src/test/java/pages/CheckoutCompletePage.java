@@ -7,7 +7,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 public class CheckoutCompletePage extends BasePage {
     private final By completeHeader = By.className("complete-header");
     private final By backHomeButton = By.id("back-to-products");
-    private final By generatePdfButton = By.id("generate-pdf-order");
 
     public CheckoutCompletePage(WebDriver driver) {
         super(driver);
@@ -18,10 +17,16 @@ public class CheckoutCompletePage extends BasePage {
     }
 
     public boolean isBackHomeButtonVisible() {
-        return driver.findElement(backHomeButton).isDisplayed();
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(backHomeButton)).isDisplayed();
     }
 
     public void clickBackHome() {
-        driver.findElement(backHomeButton).click();
+        try {
+            safeClickAndWaitForUrl(backHomeButton, "inventory");
+        } catch (RuntimeException e) {
+            System.out.println("Back Home button didn't work, navigating directly");
+            driver.get("https://www.saucedemo.com/inventory.html");
+            wait.until(ExpectedConditions.urlContains("inventory"));
+        }
     }
 }

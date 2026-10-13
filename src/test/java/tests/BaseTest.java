@@ -32,10 +32,9 @@ public class BaseTest {
             WebDriverManager.chromedriver().setup();
             ChromeOptions options = new ChromeOptions();
             options.addArguments("start-maximized");
-            options.addArguments("--incognito");
-            options.addArguments("headless");
+            options.addArguments("--headless=new");
+            options.setCapability("se:cdpEnabled", false);
             driver = new ChromeDriver(options);
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
         } else if (browser.equalsIgnoreCase("firefox")) {
             WebDriverManager.firefoxdriver().setup();
             driver = new FirefoxDriver();
