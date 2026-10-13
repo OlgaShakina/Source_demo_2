@@ -1,11 +1,14 @@
 package user;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@Getter
-@AllArgsConstructor
 public class User {
-    private final String user;
-    private final String password;
+    private String user;
+    private String password;
+
+    public User(String user, String password) {
+        this.user = user;
+        this.password = password;
+    }
+
+    public String getUser() { return user; }
+    public String getPassword() { return password; }
 }
